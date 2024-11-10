@@ -1,0 +1,202 @@
+// -- schema.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [uuidOssp(map: "uuid-ossp")]
+}
+
+/// Enum for user roles.
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EMPLOYEE
+}
+
+/// Enum for task status.
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+/// Enum for task history actions.
+enum TaskAction {
+  CREATED
+  UPDATED
+  ASSIGNED
+  MEETING
+  PAYMENT
+  COMMENTED
+}
+
+/// The Organization model represents an educational institution or organization.
+model Organization {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String    @unique
+  address     String?
+  phone       String?
+  email       String?
+  website     String?
+  description String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt   DateTime?
+
+  users         User[]        @relation("OrganizationUsers")
+  clients       Client[]      @relation("OrganizationClients")
+  tasks         Task[]        @relation("OrganizationTasks")
+  taskHistories TaskHistory[] @relation("OrganizationTaskHistories")
+
+  @@map("organization")
+}
+
+/// The User model represents the application owner or other users with access.
+model User {
+  id                  String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username            String    @unique
+  givenName           String?
+  familyName          String?
+  email               String?   @unique
+  salt                String
+  hashedPassword      String
+  role                UserRole  @default(ADMIN)
+  avatar              String?
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime?
+
+  orgId String @db.Uuid
+
+  // Relations
+  organization  Organization  @relation("OrganizationUsers", fields: [orgId], references: [id])
+  clients       Client[]      @relation("UserClients")
+  tasks         Task[]        @relation("UserTasks")
+  taskHistories TaskHistory[] @relation("UserTaskHistories")
+
+  // Audit Relations
+  createdTasks         Task[]        @relation("TaskCreatedBy")
+  updatedTasks         Task[]        @relation("TaskUpdatedBy")
+  deletedTasks         Task[]        @relation("TaskDeletedBy")
+  createdClients       Client[]      @relation("ClientCreatedBy")
+  updatedClients       Client[]      @relation("ClientUpdatedBy")
+  deletedClients       Client[]      @relation("ClientDeletedBy")
+  createdTaskHistories TaskHistory[] @relation("TaskHistoryCreatedBy")
+  updatedTaskHistories TaskHistory[] @relation("TaskHistoryUpdatedBy")
+  deletedTaskHistories TaskHistory[] @relation("TaskHistoryDeletedBy")
+
+  @@map("user")
+}
+
+/// The Client model represents clients managed by the application owner.
+model Client {
+  id         String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  givenName  String?
+  familyName String?
+  email      String? @unique
+  phone      String?
+  address    String?
+  notes      String?
+  active     Boolean @default(true)
+  avatar     String?
+  gender     String?
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime?
+
+  orgId String @db.Uuid
+
+  // Relations
+  organization  Organization  @relation("OrganizationClients", fields: [orgId], references: [id])
+  owner         User          @relation("UserClients", fields: [ownerId], references: [id])
+  ownerId       String        @db.Uuid
+  tasks         Task[]        @relation("ClientTasks")
+  taskHistories TaskHistory[] @relation("ClientTaskHistories")
+
+  // Audit Relations
+  createdBy User? @relation("ClientCreatedBy", fields: [createdByUserId], references: [id])
+  updatedBy User? @relation("ClientUpdatedBy", fields: [updatedByUserId], references: [id])
+  deletedBy User? @relation("ClientDeletedBy", fields: [deletedByUserId], references: [id])
+
+  createdByUserId String? @db.Uuid
+  updatedByUserId String? @db.Uuid
+  deletedByUserId String? @db.Uuid
+
+  @@map("client")
+}
+
+/// The Task model represents tasks assigned to clients.
+model Task {
+  id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String
+  description String?
+  status      TaskStatus @default(PENDING)
+  dueDate     DateTime?
+  createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
+  deletedAt   DateTime?
+
+  orgId String @db.Uuid
+
+  // Relations
+  organization  Organization  @relation("OrganizationTasks", fields: [orgId], references: [id])
+  owner         User          @relation("UserTasks", fields: [ownerId], references: [id])
+  ownerId       String        @db.Uuid
+  client        Client        @relation("ClientTasks", fields: [clientId], references: [id])
+  clientId      String        @db.Uuid
+  taskHistories TaskHistory[] @relation("TaskTaskHistories")
+
+  // Audit Relations
+  createdBy User? @relation("TaskCreatedBy", fields: [createdByUserId], references: [id])
+  updatedBy User? @relation("TaskUpdatedBy", fields: [updatedByUserId], references: [id])
+  deletedBy User? @relation("TaskDeletedBy", fields: [deletedByUserId], references: [id])
+
+  createdByUserId String? @db.Uuid
+  updatedByUserId String? @db.Uuid
+  deletedByUserId String? @db.Uuid
+
+  @@map("task")
+}
+
+/// The TaskHistory model represents historical records of actions taken on tasks.
+model TaskHistory {
+  id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  action    TaskAction
+  details   String?
+  timestamp DateTime   @default(now()) @db.Timestamptz(6)
+
+  orgId String @db.Uuid
+
+  // Relations
+  organization Organization @relation("OrganizationTaskHistories", fields: [orgId], references: [id])
+
+  task     Task   @relation("TaskTaskHistories", fields: [taskId], references: [id])
+  taskId   String @db.Uuid
+  client   Client @relation("ClientTaskHistories", fields: [clientId], references: [id])
+  clientId String @db.Uuid
+  user     User   @relation("UserTaskHistories", fields: [userId], references: [id])
+  userId   String @db.Uuid
+
+  // Audit Relations
+  createdBy User? @relation("TaskHistoryCreatedBy", fields: [createdByUserId], references: [id])
+  updatedBy User? @relation("TaskHistoryUpdatedBy", fields: [updatedByUserId], references: [id])
+  deletedBy User? @relation("TaskHistoryDeletedBy", fields: [deletedByUserId], references: [id])
+
+  createdByUserId String? @db.Uuid
+  updatedByUserId String? @db.Uuid
+  deletedByUserId String? @db.Uuid
+
+  @@unique([taskId, userId, timestamp]) // Adjust based on your specific uniqueness requirements
+  @@map("task_history")
+}

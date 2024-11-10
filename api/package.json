@@ -1,0 +1,15 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@redwoodjs/api": "8.4.0",
+    "@redwoodjs/auth-dbauth-api": "8.4.0",
+    "@redwoodjs/graphql-server": "8.4.0",
+    "moment-timezone": "^0.5.46",
+    "pino-pretty": "^11.2.2"
+  },
+  "scripts": {
+    "ap": "./../scripts/add_paths.sh ./src"
+  }
+}

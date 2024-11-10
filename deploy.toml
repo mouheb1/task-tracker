@@ -1,0 +1,12 @@
+[[development.servers]]
+host = "37.27.214.227"
+username = "root"
+agentForward = true
+sides = ["api","web"]
+packageManagerCommand = "yarn"
+monitorCommand = "pm2"
+path = "/var/www/app"
+processNames = ["api"]
+repo = "git@github.com:mouheb1/maderasati-redwood.git"
+branch = "develop"
+keepReleases = 5
