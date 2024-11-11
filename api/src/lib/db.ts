@@ -1,5 +1,4 @@
-// -- ./src/lib/db.ts
-// api/src/lib/db.ts
+
 import { PrismaClient } from '@prisma/client'
 import { logger } from './logger'
 import { LogLevel } from '@redwoodjs/api/logger'

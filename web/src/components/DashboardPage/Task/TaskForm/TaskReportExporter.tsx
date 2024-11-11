@@ -33,6 +33,7 @@ const TaskReportExporter: React.FC<TaskReportExporterProps> = ({ task }) => {
   });
 
   const exportTaskReportToPDF = async () => {
+    // Map task histories to include prices and status
     const taskHistoriesData = fields.map((item, index) => ({
       'No.': index + 1,
       Action: item.action,
@@ -40,6 +41,9 @@ const TaskReportExporter: React.FC<TaskReportExporterProps> = ({ task }) => {
       'Created At': item.createdAt
         ? new Date(item.createdAt).toLocaleString()
         : '',
+      Price: item.price !== undefined ? item.price.toFixed(2) : '0.00',
+      Status: item.deletedAt ? 'Deleted' : 'Active',
+      DeletedAt: item.deletedAt ? new Date(item.deletedAt) : null, // Include deletedAt for later use
     }));
 
     // Prepare data
@@ -111,7 +115,11 @@ const TaskReportExporter: React.FC<TaskReportExporterProps> = ({ task }) => {
                         {
                           width: '50%',
                           stack: [
-                            { text: `Due Date:`, style: 'label', margin: [0, 10, 0, 0] },
+                            {
+                              text: `Due Date:`,
+                              style: 'label',
+                              margin: [0, 10, 0, 0],
+                            },
                             {
                               text: task?.dueDate
                                 ? new Date(task.dueDate).toLocaleDateString()
@@ -180,25 +188,40 @@ const TaskReportExporter: React.FC<TaskReportExporterProps> = ({ task }) => {
         {
           table: {
             headerRows: 1,
-            widths: ['auto', '*', '*', '*'],
+            widths: ['auto', '*', '*', '*', 'auto', 'auto'],
             body: [
               [
                 { text: 'No.', style: 'tableHeader' },
                 { text: 'Action', style: 'tableHeader' },
                 { text: 'Details', style: 'tableHeader' },
                 { text: 'Created At', style: 'tableHeader' },
+                { text: 'Price', style: 'tableHeader' },
+                { text: 'Status', style: 'tableHeader' },
               ],
               ...taskHistoriesData.map((th) => [
                 { text: th['No.'], style: 'tableCell' },
                 { text: th.Action, style: 'tableCell' },
                 { text: th.Details, style: 'tableCell' },
                 { text: th['Created At'], style: 'tableCell' },
+                { text: th.Price, style: 'tableCell' },
+                { text: th.Status, style: 'tableCell' },
               ]),
             ],
           },
           layout: {
-            fillColor: (rowIndex: number) => {
-              return rowIndex % 2 === 0 ? '#f9f9f9' : null;
+            fillColor: function (rowIndex: number, node: any, columnIndex: number) {
+              // Skip header row (rowIndex === 0)
+              if (rowIndex === 0) {
+                return null;
+              }
+              const dataIndex = rowIndex - 1; // Adjust for header row
+              const taskHistory = taskHistoriesData[dataIndex];
+              if (taskHistory.Status === 'Deleted') {
+                return '#ffcccc'; // Light red background for deleted histories
+              } else if (rowIndex % 2 === 0) {
+                return '#f9f9f9'; // Alternate row color
+              }
+              return null;
             },
             hLineColor: '#e0e0e0',
             vLineColor: '#e0e0e0',

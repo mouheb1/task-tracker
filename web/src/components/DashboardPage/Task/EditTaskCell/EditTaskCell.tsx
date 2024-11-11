@@ -25,6 +25,7 @@ export const QUERY: TypedDocumentNode<EditTaskById> = gql`
       description
       status
       dueDate
+      price
       client {
         id
         givenName
@@ -42,7 +43,9 @@ export const QUERY: TypedDocumentNode<EditTaskById> = gql`
         id
         action
         details
+        price
         createdAt
+        deletedAt
       }
     }
   }

@@ -39,6 +39,7 @@ export const schema = gql`
     title: String!
     description: String
     status: TaskStatus
+    price: Int
     dueDate: DateTime
     createdAt: DateTime
     updatedAt: DateTime
@@ -68,6 +69,7 @@ export const schema = gql`
     title: String!
     description: String
     status: TaskStatus
+    price: Int
     dueDate: DateTime
     clientId: String!
     taskHistories: [CreateTaskHistoryInput!]! # Add this line
@@ -77,6 +79,7 @@ export const schema = gql`
     title: String
     description: String
     status: TaskStatus
+    price: Int
     dueDate: DateTime
     clientId: String
     taskHistories: [UpdateTaskHistoryInput!] # Add this line

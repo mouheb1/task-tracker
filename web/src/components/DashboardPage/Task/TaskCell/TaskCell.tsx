@@ -20,6 +20,7 @@ export const QUERY: TypedDocumentNode<
       description
       status
       dueDate
+      price
       client {
         id
         givenName
@@ -40,6 +41,7 @@ export const QUERY: TypedDocumentNode<
         id
         action
         details
+        price
         createdAt
       }
     }

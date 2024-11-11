@@ -40,7 +40,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full justify-between text-left font-normal border-default-200 text-default-600"
+                className="w-full justify-between text-left font-normal border-default-200 text-default-600 bg-white"
                 disabled={disabled}
               >
                 {field.value ? formatDate(field.value) : <span>{placeholder || 'Pick a date'}</span>}

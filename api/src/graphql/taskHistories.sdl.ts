@@ -38,10 +38,13 @@ export const schema = gql`
 
   type TaskHistory {
     id: ID!
+    price: Int
     action: TaskAction!
     details: String
     createdAt: DateTime
     updatedAt: DateTime
+    deletedAt: DateTime
+    deleted: Boolean
 
     # Relations
     task: Task!
@@ -64,18 +67,22 @@ export const schema = gql`
   # **********************************************************************************************************************
 
   input CreateTaskHistoryInput {
+    price: Int
     action: TaskAction!
     details: String
     taskId: String
     createdAt: DateTime
+    deletedAt: DateTime
   }
 
   input UpdateTaskHistoryInput {
     id: String
+    price: Int
     action: TaskAction
     details: String
     taskId: String
     createdAt: DateTime
+    deletedAt: DateTime
   }
 
   # **********************************************************************************************************************

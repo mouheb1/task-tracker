@@ -51,11 +51,15 @@ export const task: QueryResolvers['task'] = async ({ id }, { context }) => {
   })
 
   const task = await db.task.findUnique({
-    where: { id, orgId, deletedAt: null },
+    where: { id, orgId },
     include: {
       user: true,
       client: true,
-      taskHistories: true,
+      taskHistories: {
+        orderBy: {
+          createdAt: 'asc'
+        }
+      }
     },
   })
 
@@ -96,6 +100,7 @@ export const createTask: MutationResolvers['createTask'] = async ({ input }, { c
         create: input.taskHistories.map((th) => ({
           action: th.action,
           details: th.details,
+          price: th.price,
           createdAt: th.createdAt,
           user: {
             connect: { id: userId },
@@ -119,7 +124,6 @@ export const createTask: MutationResolvers['createTask'] = async ({ input }, { c
 
   return newTask;
 };
-
 export const updateTask: MutationResolvers['updateTask'] = async ({ id, input }, { context }) => {
   const { id: userId, orgId } = context.currentUser as unknown as CurrentUser;
 
@@ -154,6 +158,21 @@ export const updateTask: MutationResolvers['updateTask'] = async ({ id, input },
 
   // Handle taskHistories updates
   if (taskHistories && taskHistories.length > 0) {
+    const existingHistoryIds = taskSource.taskHistories.map((history) => history.id);
+    const inputHistoryIds = taskHistories.map((history) => history.id).filter(Boolean);
+
+    // Find histories to delete (those that exist in the database but not in the input)
+    const historiesToDelete = existingHistoryIds.filter((id) => !inputHistoryIds.includes(id));
+
+    // Set deletedAt for histories that are removed
+    for (const historyId of historiesToDelete) {
+      await db.taskHistory.update({
+        where: { id: historyId },
+        data: { deletedAt: new Date(), updatedBy: { connect: { id: userId } } },
+      });
+    }
+
+    // Process updates and additions for histories present in the input
     for (const historyInput of taskHistories) {
       if (historyInput.id) {
         // Update existing history
@@ -162,6 +181,7 @@ export const updateTask: MutationResolvers['updateTask'] = async ({ id, input },
           data: {
             action: historyInput.action,
             details: historyInput.details,
+            price: historyInput.price,
             createdAt: historyInput.createdAt,
             updatedBy: {
               connect: { id: userId },
@@ -174,6 +194,7 @@ export const updateTask: MutationResolvers['updateTask'] = async ({ id, input },
           data: {
             action: historyInput.action,
             details: historyInput.details,
+            price: historyInput.price,
             createdAt: historyInput.createdAt,
             task: { connect: { id } },
             user: { connect: { id: userId } },
@@ -185,11 +206,16 @@ export const updateTask: MutationResolvers['updateTask'] = async ({ id, input },
         });
       }
     }
+  } else {
+    // If no task histories provided in input, delete all existing histories
+    await db.taskHistory.updateMany({
+      where: { taskId: id, deletedAt: null },
+      data: { deletedAt: new Date(), deletedByUserId: userId },
+    });
   }
 
   return updatedTask;
 };
-
 
 
 

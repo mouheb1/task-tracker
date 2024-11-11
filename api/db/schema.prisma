@@ -43,12 +43,14 @@ model Organization {
   address     String?
   phone       String?
   email       String?
+  logo        String?
   website     String?
   description String?
   active      Boolean   @default(true)
   createdAt   DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt   DateTime?
+  deleted     Boolean   @default(false)
 
   users         User[]        @relation("OrganizationUsers")
   clients       Client[]      @relation("OrganizationClients")
@@ -75,6 +77,7 @@ model User {
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt DateTime?
+  deleted   Boolean   @default(false)
 
   orgId String @db.Uuid
 
@@ -114,6 +117,7 @@ model Client {
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt DateTime?
+  deleted   Boolean   @default(false)
 
   orgId String @db.Uuid
 
@@ -146,6 +150,8 @@ model Task {
   createdAt   DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
   deletedAt   DateTime?
+  deleted     Boolean    @default(false)
+  price       Int        @default(0)
 
   orgId String @db.Uuid
 
@@ -174,10 +180,12 @@ model TaskHistory {
   id      String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   action  TaskAction
   details String?
+  price   Int        @default(0)
 
   createdAt DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt DateTime?
+  deleted   Boolean   @default(false)
 
   orgId String @db.Uuid
 

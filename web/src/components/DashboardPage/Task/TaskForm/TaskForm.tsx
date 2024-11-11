@@ -1,6 +1,4 @@
-// src/components/TaskForm.tsx
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
   useForm,
   useFieldArray,
@@ -40,6 +38,8 @@ interface TaskHistoryFormData {
   action: TaskAction;
   details?: string;
   createdAt?: Date;
+  price?: number;
+  deletedAt?: Date | null;
 }
 
 interface FormData {
@@ -48,6 +48,7 @@ interface FormData {
   status: TaskStatus;
   dueDate?: Date;
   clientId: string;
+  price?: number;
   taskHistories: TaskHistoryFormData[];
 }
 
@@ -80,6 +81,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
   error,
   loading,
 }) => {
+
   const methods = useForm<FormData>({
     defaultValues: {
       title: task?.title || '',
@@ -87,6 +89,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
       status: task?.status || TaskStatus.PENDING,
       dueDate: task?.dueDate ? new Date(task.dueDate) : undefined,
       clientId: task?.client?.id || '',
+      price: task?.price ? Number(task?.price) : 0,
       taskHistories:
         task?.taskHistories?.length > 0
           ? task.taskHistories.map((th) => ({
@@ -94,12 +97,15 @@ const TaskForm: React.FC<TaskFormProps> = ({
               action: th.action as TaskAction,
               details: th.details || '',
               createdAt: th.createdAt ? new Date(th.createdAt) : undefined,
+              price: th.price ? Number(th.price) : 0,
+              deletedAt: th.deletedAt ? new Date(th.deletedAt) : null,
             }))
           : [
               {
                 action: TaskAction.CREATED,
                 details: '',
                 createdAt: new Date(),
+                price: 0,
               },
             ],
     },
@@ -111,17 +117,53 @@ const TaskForm: React.FC<TaskFormProps> = ({
     formState: { errors },
   } = methods;
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, update, remove } = useFieldArray({
     control,
     name: 'taskHistories',
+    keyName: '_id'
   });
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    if (data.taskHistories.length === 0) {
-      alert('At least one task history is required.');
+    // Convert prices to numbers
+    console.log('data', data);
+
+    data.price = parseFloat(data.price as unknown as string);
+    data.taskHistories = data.taskHistories
+    .filter((history) => !history.deletedAt) // keep items without deletedAt
+    .map((history) => {
+      const { _id, deletedAt, ...historyData } = history
+      return {
+        ...historyData,
+        price: parseFloat(historyData.price as unknown as string),
+      }
+    });
+    onSave(data, task?.id);
+  };
+
+  // Helper function to count non-deleted task histories
+  const countNonDeletedHistories = () => {
+    return fields.filter((item) => !item.deletedAt).length;
+  };
+
+  // Handler for delete action
+  const handleDelete = (index: number) => {
+    const item = fields[index];
+
+    const nonDeletedCount = countNonDeletedHistories();
+
+    if (nonDeletedCount <= 1) {
+      // Show warning message
+      alert('At least one task history is required.')
       return;
     }
-    onSave(data, task?.id);
+
+    if (item.id) {
+      // Existing task history, mark as deleted
+      update(index, { ...item, deletedAt: new Date() });
+    } else {
+      // New task history, remove it completely
+      remove(index);
+    }
   };
 
   return (
@@ -129,7 +171,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {error && <div className="text-destructive mt-2">{error.message}</div>}
 
-        {/* Export Button at Top Right */}
         <div className="flex justify-end">
           {task && <TaskReportExporter task={task} />}
         </div>
@@ -183,8 +224,21 @@ const TaskForm: React.FC<TaskFormProps> = ({
             />
           </div>
 
+          {/* Price */}
+          <div className="col-span-12 md:col-span-6">
+            <CustomInput
+              control={control}
+              errors={errors}
+              name="price"
+              label="Price"
+              placeholder="Enter task price"
+              inputType="number"
+              rules={{ required: 'Price is required' }}
+            />
+          </div>
+
           {/* Description */}
-          <div className="col-span-12">
+          <div className="col-span-12 md:col-span-6">
             <CustomTextarea
               control={control}
               errors={errors}
@@ -199,50 +253,77 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <div>
           <h3 className="text-lg font-semibold mb-4">Task Histories</h3>
           {fields.map((item, index) => (
-            <div key={item.id} className="border p-4 mb-4">
+            <div
+              key={item.id || index}
+              className={`border p-4 mb-4 ${item.deletedAt ? 'bg-red-100' : ''}`}
+            >
               <div className="flex justify-between items-center mb-4">
-                <h4 className="text-md font-medium">Task History {index + 1}</h4>
-                <Button
-                  variant="destructive"
-                  type="button"
-                  onClick={() => remove(index)}
-                >
-                  Remove
-                </Button>
+                <h4 className="text-md font-medium">
+                  Task History {index + 1}
+                </h4>
+                {!item.deletedAt && (
+                  <Button
+                    color="destructive"
+                    type="button"
+                    onClick={() => handleDelete(index)}
+                  >
+                    Remove
+                  </Button>
+                )}
               </div>
 
-              {/* Action */}
-              <CustomSelect
-                control={control}
-                errors={errors}
-                name={`taskHistories.${index}.action` as const}
-                label="Action"
-                options={TASK_ACTION_OPTIONS}
-                rules={{ required: 'Action is required' }}
-              />
+              <div className="grid grid-cols-12 md:gap-x-12 gap-y-5">
+                {/* Action */}
+                <div className="col-span-12 md:col-span-6">
+                  <CustomSelect
+                    control={control}
+                    errors={errors}
+                    name={`taskHistories.${index}.action` as const}
+                    label="Action"
+                    options={TASK_ACTION_OPTIONS}
+                    rules={{ required: 'Action is required' }}
+                  />
+                </div>
 
-              {/* Details */}
-              <CustomTextarea
-                control={control}
-                errors={errors}
-                name={`taskHistories.${index}.details` as const}
-                label="Details"
-                placeholder="Enter details"
-              />
+                {/* Price */}
+                <div className="col-span-12 md:col-span-6">
+                  <CustomInput
+                    control={control}
+                    errors={errors}
+                    name={`taskHistories.${index}.price` as const}
+                    label="Price"
+                    placeholder="Enter price"
+                    inputType="number"
+                    rules={{ required: 'Price is required' }}
+                  />
+                </div>
 
-              {/* CreatedAt */}
-              <CustomDatePicker
-                control={control}
-                errors={errors}
-                name={`taskHistories.${index}.createdAt` as const}
-                label="Created At"
-                placeholder="Select date"
-                disabled={loading}
-              />
+                {/* CreatedAt */}
+                <div className="col-span-12 md:col-span-6">
+                  <CustomDatePicker
+                    control={control}
+                    errors={errors}
+                    name={`taskHistories.${index}.createdAt` as const}
+                    label="Created At"
+                    placeholder="Select date"
+                    disabled={loading}
+                  />
+                </div>
+
+                {/* Details */}
+                <div className="col-span-12 md:col-span-6">
+                  <CustomTextarea
+                    control={control}
+                    errors={errors}
+                    name={`taskHistories.${index}.details` as const}
+                    label="Details"
+                    placeholder="Enter details"
+                  />
+                </div>
+              </div>
             </div>
           ))}
 
-          {/* Add New Task History Button */}
           <Button
             type="button"
             onClick={() =>
@@ -250,6 +331,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
                 action: TaskAction.CREATED,
                 details: '',
                 createdAt: new Date(),
+                price: 0,
+                deletedAt: null,
               })
             }
             className="mt-4"
@@ -258,7 +341,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
           </Button>
         </div>
 
-        {/* Submit Buttons */}
         <div className="mt-6 flex gap-5 justify-end">
           <Button
             color="secondary"
