@@ -97,7 +97,7 @@ const Clients = ({ items, pageInfo, onPageChange, pageSize, currentPage, refetch
       title: 'Notes',
       key: 'role',
       render: (cellContext) => {
-        return cellContext.row.original.notes || 'No Notes'
+        return truncate(cellContext.row.original.notes) || 'No Notes'
       },
     },
     {

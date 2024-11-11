@@ -69,8 +69,8 @@ export const schema = gql`
     description: String
     status: TaskStatus
     dueDate: DateTime
-    ownerId: String!
     clientId: String!
+    taskHistories: [CreateTaskHistoryInput!]! # Add this line
   }
 
   input UpdateTaskInput {
@@ -78,8 +78,8 @@ export const schema = gql`
     description: String
     status: TaskStatus
     dueDate: DateTime
-    ownerId: String
     clientId: String
+    taskHistories: [UpdateTaskHistoryInput!] # Add this line
   }
 
   # **********************************************************************************************************************

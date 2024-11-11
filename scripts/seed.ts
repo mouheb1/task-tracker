@@ -105,7 +105,8 @@ export default async () => {
             data: {
               action: 'CREATED', // Ensure this matches your TaskAction enum
               details: `Task ${i} for ${client.givenName} ${client.familyName} history ${j}`,
-              timestamp: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
               taskId: task.id,
               clientId: client.id,
               userId: user.id,

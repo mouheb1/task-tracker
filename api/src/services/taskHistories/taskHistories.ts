@@ -15,7 +15,7 @@ export const taskHistories: QueryResolvers['taskHistories'] = async ({ limit = 1
   const where = prismaBuildWhereClause(filter, ['details']) || {}
   where.deletedAt = null
 
-  const orderBy = sortBy ? { [sortBy.field]: sortBy.direction.toLowerCase() } : { timestamp: 'desc' }
+  const orderBy = sortBy ? { [sortBy.field]: sortBy.direction.toLowerCase() } : { createdAt: 'desc' }
 
   const [totalCount, items] = await Promise.all([
     db.taskHistory.count({ where }),

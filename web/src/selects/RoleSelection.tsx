@@ -14,12 +14,8 @@ interface RolesSelectProps {
 
 // Static list of roles based on your `AdminRole` enum
 const roles = [
-  { value: 'PRINCIPAL', label: 'PRINCIPAL' },
-  { value: 'COUNSELOR', label: 'COUNSELOR' },
-  { value: 'LIBRARIAN', label: 'LIBRARIAN' },
-  { value: 'ACCOUNTANT', label: 'ACCOUNTANT' },
-  { value: 'RECEPTIONIST', label: 'RECEPTIONIST' },
-  { value: 'IT_SUPPORT', label: 'IT SUPPORT' },
+  { value: 'ADMIN', label: 'ADMIN' },
+  { value: 'EMPLOYEE', label: 'EMPLOYEE' },
 ]
 
 const RolesSelect: React.FC<RolesSelectProps> = ({ control, errors, defaultValue }) => {

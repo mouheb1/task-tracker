@@ -171,10 +171,13 @@ model Task {
 
 /// The TaskHistory model represents historical records of actions taken on tasks.
 model TaskHistory {
-  id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  action    TaskAction
-  details   String?
-  timestamp DateTime   @default(now()) @db.Timestamptz(6)
+  id      String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  action  TaskAction
+  details String?
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime?
 
   orgId String @db.Uuid
 
@@ -197,6 +200,6 @@ model TaskHistory {
   updatedByUserId String? @db.Uuid
   deletedByUserId String? @db.Uuid
 
-  @@unique([taskId, userId, timestamp]) // Adjust based on your specific uniqueness requirements
+  // @@unique([taskId, userId, createdAt]) // Adjust based on your specific uniqueness requirements
   @@map("task_history")
 }

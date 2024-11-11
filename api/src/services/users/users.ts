@@ -13,12 +13,13 @@ import { UserRole } from './types'
 import { cleanObject } from '../../tools/object'
 import { CurrentUser, requireAuth } from 'src/lib/auth'
 
-export const users: QueryResolvers['users'] = async ({ limit = 10, page = 1, sortBy, filter = {} }) => {
+export const users: QueryResolvers['users'] = async ({ limit = 10, page = 1, sortBy, filter = {} }, { context }) => {
+  const { orgId } = context.currentUser as unknown as CurrentUser
   requireAuth({
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   })
 
-  const where = prismaBuildWhereClause(filter, ['username', 'email']) || {}
+  const where = prismaBuildWhereClause({ ...filter, orgId }, ['username', 'email']) || {}
   where.deletedAt = null
 
   const orderBy = sortBy ? { [sortBy.field]: sortBy.direction.toLowerCase() } : { createdAt: 'desc' }
@@ -41,13 +42,15 @@ export const users: QueryResolvers['users'] = async ({ limit = 10, page = 1, sor
   return applyPagination({ items, totalCount, limit, page })
 }
 
-export const user: QueryResolvers['user'] = async ({ id }) => {
+export const user: QueryResolvers['user'] = async ({ id }, { context }) => {
+  const { orgId } = context.currentUser as unknown as CurrentUser
+
   requireAuth({
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   })
 
   const user = await db.user.findUnique({
-    where: { id, deletedAt: null },
+    where: { id, orgId, deletedAt: null },
     include: {
       clients: true,
       tasks: true,
@@ -62,7 +65,8 @@ export const user: QueryResolvers['user'] = async ({ id }) => {
   return user
 }
 
-export const createUser: MutationResolvers['createUser'] = async ({ input }) => {
+export const createUser: MutationResolvers['createUser'] = async ({ input }, { context }) => {
+  const { orgId } = context.currentUser as unknown as CurrentUser
   requireAuth({
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   })
@@ -70,7 +74,7 @@ export const createUser: MutationResolvers['createUser'] = async ({ input }) => 
   const { email, password, ...userData } = input
 
   const existingUser = await db.user.findUnique({
-    where: { email, deletedAt: null },
+    where: { email, orgId, deletedAt: null },
   })
 
   if (existingUser) {
@@ -80,7 +84,7 @@ export const createUser: MutationResolvers['createUser'] = async ({ input }) => 
   const data = {
     ...userData,
     email,
-    role: input.role || UserRole.ADMIN,
+    role: input.role || UserRole.EMPLOYEE,
   } as any
 
   if (password) {
@@ -96,13 +100,14 @@ export const createUser: MutationResolvers['createUser'] = async ({ input }) => 
   return newUser
 }
 
-export const updateUser: MutationResolvers['updateUser'] = async ({ id, input }) => {
+export const updateUser: MutationResolvers['updateUser'] = async ({ id, input }, { context }) => {
+  const { orgId } = context.currentUser as unknown as CurrentUser
   requireAuth({
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   })
 
   const user = await db.user.findUnique({
-    where: { id, deletedAt: null },
+    where: { id, orgId, deletedAt: null },
   })
 
   if (!user) {
@@ -111,28 +116,31 @@ export const updateUser: MutationResolvers['updateUser'] = async ({ id, input })
 
   const { password, ...userData } = cleanObject(input)
 
-  if (password) {
-    const [hashedPassword, salt] = hashPassword(password)
-    userData.hashedPassword = hashedPassword
-    userData.salt = salt
-  }
+  // if (password) {
+  //   const [hashedPassword, salt] = hashPassword(password)
+  //   userData.hashedPassword = hashedPassword
+  //   userData.salt = salt
+  // }
 
   const updatedUser = await db.user.update({
-    where: { id },
+    where: { id, deletedAt: null },
     data: userData,
   })
 
   return updatedUser
 }
 
-export const deleteUser: MutationResolvers['deleteUser'] = async ({ id }) => {
+export const deleteUser: MutationResolvers['deleteUser'] = async ({ id }, { context }) => {
+  const { orgId } = context.currentUser as unknown as CurrentUser
   requireAuth({
     roles: [UserRole.SUPER_ADMIN, UserRole.ADMIN],
   })
 
   return db.user.update({
-    where: { id, deletedAt: null },
-    data: { deletedAt: new Date() },
+    where: { id, orgId, deletedAt: null },
+    data: {
+      deletedAt: new Date()
+    },
   })
 }
 

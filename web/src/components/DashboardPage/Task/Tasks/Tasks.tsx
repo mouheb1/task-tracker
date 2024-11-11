@@ -1,5 +1,6 @@
 // -- ./src/components/DashboardPage/Task/Tasks/Tasks.tsx
 import type {
+  Client,
   DeleteTaskMutation,
   DeleteTaskMutationVariables,
 } from 'types/graphql'
@@ -12,6 +13,7 @@ import { toast } from '@redwoodjs/web/toast'
 import { Table } from 'src/template/components/table'
 import type { TableColType } from 'src/template/components/table'
 import { SortingState } from '@tanstack/react-table'
+import { timeTag, truncate } from 'src/lib/formatters'
 
 const DELETE_TASK_MUTATION: TypedDocumentNode<
   DeleteTaskMutation,
@@ -28,9 +30,10 @@ interface Task {
   id: string
   name: string
   description: string
-  grade?: {
-    name: string
-  }
+  client: Partial<Client>
+  status: string
+  title: string
+  dueDate: string
 }
 
 interface PageInfo {
@@ -80,14 +83,26 @@ const Tasks = ({
 
   const columns: TableColType<Partial<Task>>[] = [
     {
-      title: 'Name',
-      key: 'name',
-      render: (cellContext) => cellContext.row.original.name,
+      title: 'Title',
+      key: 'title',
+      render: (cellContext) => truncate(cellContext.row.original.title),
     },
     {
-      title: 'Description',
-      key: 'description',
-      render: (cellContext) => cellContext.row.original.description,
+      title: 'Status',
+      key: 'status',
+      render: (cellContext) => truncate(cellContext.row.original.status),
+    },
+    {
+      title: 'Client',
+      key: 'client',
+      render: (cellContext) => truncate(cellContext.row.original.client?.givenName) + '' + truncate(cellContext.row.original.client?.familyName),
+    },
+    {
+      title: 'DueDate',
+      key: 'dueDate',
+      render: (cellContext) => {
+        return timeTag(cellContext.row.original.dueDate)
+      },
     },
   ]
 

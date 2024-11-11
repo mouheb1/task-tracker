@@ -1,4 +1,5 @@
 // -- ./src/components/DashboardPage/Task/TasksCell/TasksCell.tsx
+
 import type { FindTasks, FindTasksVariables } from 'types/graphql'
 
 import { useState } from 'react'
@@ -12,10 +13,13 @@ export const QUERY: TypedDocumentNode<FindTasks, FindTasksVariables> = gql`
     tasks(limit: $limit, page: $page, sortBy: $sortBy, filter: $filter) {
       items {
         id
+        status
+        title
         client {
           givenName
-
+          familyName
         }
+        dueDate
         description
         createdAt
         updatedAt

@@ -97,7 +97,9 @@ CREATE TABLE "task_history" (
     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
     "action" "TaskAction" NOT NULL,
     "details" TEXT,
-    "timestamp" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ(6) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
     "orgId" UUID NOT NULL,
     "taskId" UUID NOT NULL,
     "clientId" UUID NOT NULL,
@@ -120,9 +122,6 @@ CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "client_email_key" ON "client"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "task_history_taskId_userId_timestamp_key" ON "task_history"("taskId", "userId", "timestamp");
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

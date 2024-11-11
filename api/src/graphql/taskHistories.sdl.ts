@@ -40,7 +40,8 @@ export const schema = gql`
     id: ID!
     action: TaskAction!
     details: String
-    timestamp: DateTime
+    createdAt: DateTime
+    updatedAt: DateTime
 
     # Relations
     task: Task!
@@ -65,17 +66,15 @@ export const schema = gql`
   input CreateTaskHistoryInput {
     action: TaskAction!
     details: String
-    taskId: String!
-    clientId: String!
-    userId: String!
+    taskId: String
+    createdAt: DateTime
   }
 
   input UpdateTaskHistoryInput {
     action: TaskAction
     details: String
     taskId: String
-    clientId: String
-    userId: String
+    createdAt: DateTime
   }
 
   # **********************************************************************************************************************
@@ -89,6 +88,7 @@ export const schema = gql`
     taskId: IDFilter
     clientId: IDFilter
     userId: IDFilter
-    timestamp: DateFilter
+    createdAt: DateFilter
+    updatedAt: DateFilter
   }
 `
