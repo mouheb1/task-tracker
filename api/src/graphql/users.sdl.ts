@@ -42,6 +42,7 @@ export const schema = gql`
     avatar: String
     hashedPassword: String
     role: UserRole
+    organization: Organization
     resetToken: String
     resetTokenExpiresAt: DateTime
     createdAt: DateTime
