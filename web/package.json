@@ -29,6 +29,7 @@
     "humanize-string": "2.1.0",
     "next-auth": "^4.24.8",
     "next-themes": "^0.3.0",
+    "pdfmake": "^0.2.15",
     "react": "18.3.1",
     "react-day-picker": "^8.8.1",
     "react-dom": "18.3.1",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@redwoodjs/vite": "8.4.0",
+    "@types/pdfmake": "^0",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.20",

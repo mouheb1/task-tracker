@@ -16,14 +16,31 @@ export const QUERY: TypedDocumentNode<
 > = gql`
   query FindTaskById($id: String!) {
     task: task(id: $id) {
-      id
       title
-      status
       description
+      status
+      dueDate
+      client {
+        id
+        givenName
+        familyName
+        email
+        phone
+      }
+      user {
+        id
+        givenName
+        familyName
+        email
+        organization {
+          logo
+        }
+      }
       taskHistories {
         id
         action
         details
+        createdAt
       }
     }
   }
