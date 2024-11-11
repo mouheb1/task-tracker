@@ -44,7 +44,7 @@ export const schema = gql`
     deletedAt: DateTime
 
     # Relations
-    owner: User
+    user: User
     tasks: [Task]
     taskHistories: [TaskHistory]
 
@@ -73,7 +73,7 @@ export const schema = gql`
     notes: String
     gender: ClientGender
     active: Boolean
-    ownerId: String!
+    userId: String!
   }
 
   input UpdateClientInput {
@@ -86,7 +86,7 @@ export const schema = gql`
     notes: String
     gender: ClientGender
     active: Boolean
-    ownerId: String
+    userId: String
   }
 
   # **********************************************************************************************************************
@@ -97,7 +97,7 @@ export const schema = gql`
     fullTextSearch: String
     id: IDFilter
     email: [String]
-    ownerId: IDFilter
+    userId: IDFilter
     active: Boolean
     createdAt: DateFilter
     updatedAt: DateFilter

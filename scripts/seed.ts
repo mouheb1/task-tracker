@@ -47,7 +47,7 @@ export default async () => {
         address: '456 Client Road',
         notes: 'Important client one.',
         active: true,
-        ownerId: user.id,
+        userId: user.id,
         orgId: organization.id,
       },
       {
@@ -58,7 +58,7 @@ export default async () => {
         address: '457 Client Road',
         notes: 'Important client two.',
         active: true,
-        ownerId: user.id,
+        userId: user.id,
         orgId: organization.id,
       },
       {
@@ -69,7 +69,7 @@ export default async () => {
         address: '458 Client Road',
         notes: 'Important client three.',
         active: true,
-        ownerId: user.id,
+        userId: user.id,
         orgId: organization.id,
       },
     ]
@@ -92,7 +92,7 @@ export default async () => {
             description: `Description for Task ${i} of ${client.givenName} ${client.familyName}`,
             status: 'PENDING', // Ensure this matches your TaskStatus enum
             dueDate: new Date(Date.now() + i * 7 * 24 * 60 * 60 * 1000), // Due dates staggered by weeks
-            ownerId: user.id, // Assign task to the user
+            userId: user.id, // Assign task to the user
             clientId: client.id, // Assign task to the client
             orgId: organization.id, // Associate task with organization
           },

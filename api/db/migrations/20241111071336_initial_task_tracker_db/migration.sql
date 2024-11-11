@@ -64,7 +64,7 @@ CREATE TABLE "client" (
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
     "deletedAt" TIMESTAMP(3),
     "orgId" UUID NOT NULL,
-    "ownerId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
     "createdByUserId" UUID,
     "updatedByUserId" UUID,
     "deletedByUserId" UUID,
@@ -83,7 +83,7 @@ CREATE TABLE "task" (
     "updatedAt" TIMESTAMPTZ(6) NOT NULL,
     "deletedAt" TIMESTAMP(3),
     "orgId" UUID NOT NULL,
-    "ownerId" UUID NOT NULL,
+    "userId" UUID NOT NULL,
     "clientId" UUID NOT NULL,
     "createdByUserId" UUID,
     "updatedByUserId" UUID,
@@ -130,7 +130,7 @@ ALTER TABLE "user" ADD CONSTRAINT "user_orgId_fkey" FOREIGN KEY ("orgId") REFERE
 ALTER TABLE "client" ADD CONSTRAINT "client_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "client" ADD CONSTRAINT "client_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "client" ADD CONSTRAINT "client_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "client" ADD CONSTRAINT "client_createdByUserId_fkey" FOREIGN KEY ("createdByUserId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -145,7 +145,7 @@ ALTER TABLE "client" ADD CONSTRAINT "client_deletedByUserId_fkey" FOREIGN KEY ("
 ALTER TABLE "task" ADD CONSTRAINT "task_orgId_fkey" FOREIGN KEY ("orgId") REFERENCES "organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "task" ADD CONSTRAINT "task_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "task" ADD CONSTRAINT "task_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "task" ADD CONSTRAINT "task_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

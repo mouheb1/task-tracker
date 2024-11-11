@@ -32,7 +32,7 @@ export const tasks: QueryResolvers['tasks'] = async ({ limit = 10, page = 1, sor
       skip: (page - 1) * limit,
       take: limit,
       include: {
-        owner: true,
+        user: true,
         client: true,
         taskHistories: true,
       },
@@ -53,7 +53,7 @@ export const task: QueryResolvers['task'] = async ({ id }, { context }) => {
   const task = await db.task.findUnique({
     where: { id, orgId, deletedAt: null },
     include: {
-      owner: true,
+      user: true,
       client: true,
       taskHistories: true,
     },
@@ -77,7 +77,7 @@ export const createTask: MutationResolvers['createTask'] = async ({ input }, { c
       description: input.description,
       status: input.status,
       dueDate: input.dueDate,
-      owner: {
+      user: {
         connect: { id: userId },
       },
       organization: {
@@ -121,7 +121,7 @@ export const createTask: MutationResolvers['createTask'] = async ({ input }, { c
 };
 
 export const updateTask: MutationResolvers['updateTask'] = async ({ id, input }, { context }) => {
-  const { id: userId, orgId } = context.currentUser as unknown as CurrentUser
+  const { id: userId, orgId } = context.currentUser as unknown as CurrentUser;
 
   requireAuth({ roles: [UserRole.ADMIN] });
 
@@ -134,52 +134,53 @@ export const updateTask: MutationResolvers['updateTask'] = async ({ id, input },
     throw new TaskNotFoundError();
   }
 
-  // Update the task
+  // Extract taskHistories from input
+  const { taskHistories, clientId, ...taskData } = input;
+
+  // Update the task without taskHistories
   const updatedTask = await db.task.update({
     where: { id },
     data: {
-      ...input,
+      ...taskData,
       organization: {
         connect: { id: orgId },
       },
-      client: input.clientId
-        ? { connect: { id: input.clientId } }
-        : undefined,
+      client: clientId ? { connect: { id: clientId } } : undefined,
       updatedBy: {
-        connect: { id: userId }
+        connect: { id: userId },
       },
     },
   });
 
-  // Update task histories
-  if (input.taskHistories && input.taskHistories.length > 0) {
-    for (const historyInput of input.taskHistories) {
+  // Handle taskHistories updates
+  if (taskHistories && taskHistories.length > 0) {
+    for (const historyInput of taskHistories) {
       if (historyInput.id) {
         // Update existing history
         await db.taskHistory.update({
           where: { id: historyInput.id },
           data: {
-            ...historyInput,
-            updatedByUserId: userId,
+            action: historyInput.action,
+            details: historyInput.details,
+            createdAt: historyInput.createdAt,
+            updatedBy: {
+              connect: { id: userId },
+            },
           },
         });
       } else {
         // Create new history
         await db.taskHistory.create({
           data: {
-            ...historyInput,
+            action: historyInput.action,
+            details: historyInput.details,
+            createdAt: historyInput.createdAt,
             task: { connect: { id } },
-            user: {
-              connect: { id: userId },
-            },
+            user: { connect: { id: userId } },
             client: { connect: { id: input.clientId } },
             organization: { connect: { id: orgId } },
-            createdBy: {
-              connect: { id: userId }
-            },
-            updatedBy: {
-              connect: { id: userId }
-            },
+            createdBy: { connect: { id: userId } },
+            updatedBy: { connect: { id: userId } },
           },
         });
       }
@@ -188,6 +189,7 @@ export const updateTask: MutationResolvers['updateTask'] = async ({ id, input },
 
   return updatedTask;
 };
+
 
 
 
@@ -210,7 +212,7 @@ export const deleteTask: MutationResolvers['deleteTask'] = async ({ id }, { cont
 }
 
 export const Task: TaskRelationResolvers = {
-  owner: (_obj, { root }) => db.task.findUnique({ where: { id: root.id } }).owner(),
+  user: (_obj, { root }) => db.task.findUnique({ where: { id: root.id } }).user(),
   client: (_obj, { root }) => db.task.findUnique({ where: { id: root.id } }).client(),
   taskHistories: (_obj, { root }) => db.task.findUnique({ where: { id: root.id } }).taskHistories(),
 }

@@ -58,7 +58,7 @@ model Organization {
   @@map("organization")
 }
 
-/// The User model represents the application owner or other users with access.
+/// The User model represents the application user or other users with access.
 model User {
   id                  String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   username            String    @unique
@@ -98,7 +98,7 @@ model User {
   @@map("user")
 }
 
-/// The Client model represents clients managed by the application owner.
+/// The Client model represents clients managed by the application user.
 model Client {
   id         String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   givenName  String?
@@ -119,8 +119,8 @@ model Client {
 
   // Relations
   organization  Organization  @relation("OrganizationClients", fields: [orgId], references: [id])
-  owner         User          @relation("UserClients", fields: [ownerId], references: [id])
-  ownerId       String        @db.Uuid
+  user          User          @relation("UserClients", fields: [userId], references: [id])
+  userId        String        @db.Uuid
   tasks         Task[]        @relation("ClientTasks")
   taskHistories TaskHistory[] @relation("ClientTaskHistories")
 
@@ -151,8 +151,8 @@ model Task {
 
   // Relations
   organization  Organization  @relation("OrganizationTasks", fields: [orgId], references: [id])
-  owner         User          @relation("UserTasks", fields: [ownerId], references: [id])
-  ownerId       String        @db.Uuid
+  user          User          @relation("UserTasks", fields: [userId], references: [id])
+  userId        String        @db.Uuid
   client        Client        @relation("ClientTasks", fields: [clientId], references: [id])
   clientId      String        @db.Uuid
   taskHistories TaskHistory[] @relation("TaskTaskHistories")

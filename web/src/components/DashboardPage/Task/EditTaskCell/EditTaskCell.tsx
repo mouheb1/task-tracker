@@ -22,9 +22,20 @@ export const QUERY: TypedDocumentNode<EditTaskById> = gql`
     task: task(id: $id) {
       id
       title
+      status
+      client {
+        id
+        givenName
+        familyName
+        email
+      }
+      dueDate
       description
       taskHistories {
         id
+        action
+        details
+        createdAt
       }
     }
   }

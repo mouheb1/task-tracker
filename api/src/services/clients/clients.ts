@@ -25,7 +25,7 @@ export const clients: QueryResolvers['clients'] = async ({ limit = 10, page = 1,
       skip: (page - 1) * limit,
       take: limit,
       include: {
-        owner: true,
+        user: true,
         tasks: true,
       },
     }),
@@ -40,7 +40,7 @@ export const client: QueryResolvers['client'] = async ({ id }) => {
   const client = await db.client.findUnique({
     where: { id, deletedAt: null },
     include: {
-      owner: true,
+      user: true,
       tasks: true,
     },
   })
@@ -83,7 +83,7 @@ export const deleteClient: MutationResolvers['deleteClient'] = async ({ id }) =>
 }
 
 export const Client: ClientRelationResolvers = {
-  owner: (_obj, { root }) => db.client.findUnique({ where: { id: root.id } }).owner(),
+  user: (_obj, { root }) => db.client.findUnique({ where: { id: root.id } }).user(),
   tasks: (_obj, { root }) => db.client.findUnique({ where: { id: root.id } }).tasks(),
   taskHistories: (_obj, { root }) => db.client.findUnique({ where: { id: root.id } }).taskHistories(),
 }

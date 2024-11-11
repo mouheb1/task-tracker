@@ -145,6 +145,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, error, loading }) => 
             name="clientId"
             label="Client"
             required={true}
+            defaultValue={task?.client?.id}
           />
         </div>
 

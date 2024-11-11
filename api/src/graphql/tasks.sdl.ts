@@ -45,7 +45,7 @@ export const schema = gql`
     deletedAt: DateTime
 
     # Relations
-    owner: User
+    user: User
     client: Client
     taskHistories: [TaskHistory]
 
@@ -90,7 +90,7 @@ export const schema = gql`
     fullTextSearch: String
     id: IDFilter
     status: [TaskStatus]
-    ownerId: IDFilter
+    userId: IDFilter
     clientId: IDFilter
     createdAt: DateFilter
     updatedAt: DateFilter

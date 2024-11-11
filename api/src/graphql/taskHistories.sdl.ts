@@ -71,6 +71,7 @@ export const schema = gql`
   }
 
   input UpdateTaskHistoryInput {
+    id: String
     action: TaskAction
     details: String
     taskId: String

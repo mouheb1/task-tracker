@@ -108,7 +108,7 @@ describe('jsonDisplay', () => {
             cpu: 79.5,
           },
         },
-        owner: {
+        user: {
           dob: '1979-05-27T07:32:00-08:00',
           name: 'Tom Preston-Werner',
         },
@@ -149,7 +149,7 @@ describe('jsonDisplay', () => {
             "cpu": 79.5
           }
         },
-        "owner": {
+        "user": {
           "dob": "1979-05-27T07:32:00-08:00",
           "name": "Tom Preston-Werner"
         },
