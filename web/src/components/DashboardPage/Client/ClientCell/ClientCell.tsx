@@ -15,13 +15,15 @@ export const QUERY: TypedDocumentNode<FindClientById, FindClientByIdVariables> =
     query FindClientById($id: String!) {
       client: client(id: $id) {
         id
-        avatar
-        gender
-        phone
         givenName
         familyName
         email
+        avatar
+        gender
+        notes
+        phone
         createdAt
+        updatedAt
       }
     }
   `

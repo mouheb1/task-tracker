@@ -25,6 +25,10 @@ export const QUERY: TypedDocumentNode<EditClientById> = gql`
       givenName
       familyName
       email
+      avatar
+      gender
+      notes
+      phone
       createdAt
       updatedAt
     }
@@ -41,6 +45,10 @@ const UPDATE_USER_MUTATION: TypedDocumentNode<
       givenName
       familyName
       email
+      avatar
+      gender
+      notes
+      phone
       createdAt
       updatedAt
     }

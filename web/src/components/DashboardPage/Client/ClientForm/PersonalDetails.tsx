@@ -4,11 +4,10 @@ import React from 'react';
 import { Control, FieldErrors } from 'react-hook-form';
 
 import CustomInput from 'src/selects/CustomInput';
-import CustomDatePicker from 'src/selects/CustomDatePicker';
 import CustomRadioGroup from 'src/selects/CustomRadioGroup';
 import CustomFileUploader from 'src/selects/CustomFileUploader';
 import { ClientGender } from 'src/lib/type';
-import RolesSelect from 'src/selects/RoleSelection';
+import CustomTextarea from 'src/selects/CustomTextarea';
 
 interface PersonalDetailsProps {
   control: Control<any>;
@@ -58,16 +57,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           rules={{ required: 'Family name is required' }}
         />
 
-        {/* Clientname */}
-        <CustomInput
-          control={control}
-          errors={errors}
-          name="clientname"
-          label="Clientname"
-          placeholder="Enter clientname"
-          rules={{ required: 'Clientname is required' }}
-        />
-
         {/* Email */}
         <CustomInput
           control={control}
@@ -95,17 +84,6 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           inputType="tel"
         />
 
-        {/* Birth Date */}
-        <CustomDatePicker
-          control={control}
-          errors={errors}
-          name="birthDate"
-          label="Birth Date"
-          placeholder="Select birth date"
-          rules={{ required: 'Birth date is required' }}
-          disabled={loading}
-        />
-
         {/* Gender */}
         <CustomRadioGroup
           control={control}
@@ -120,22 +98,13 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           disabled={loading}
         />
 
-        {/* Role */}
-        <RolesSelect
+        {/* Note */}
+        <CustomTextarea
           control={control}
           errors={errors}
-        // defaultValue={client?.role}
-        />
-
-        {/* Password */}
-        <CustomInput
-          control={control}
-          errors={errors}
-          name="password"
-          label="Password"
-          placeholder="Enter password"
-          inputType="password"
-          // rules={{ required: 'Password is required' }}
+          name="notes"
+          label="Note"
+          placeholder="Note"
         />
       </div>
     </div>

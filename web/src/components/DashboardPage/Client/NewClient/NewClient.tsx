@@ -21,6 +21,15 @@ const CREATE_USER_MUTATION: TypedDocumentNode<
   mutation CreateClientMutation($input: CreateClientInput!) {
     createClient(input: $input) {
       id
+      givenName
+      familyName
+      email
+      avatar
+      gender
+      notes
+      phone
+      createdAt
+      updatedAt
     }
   }
 `

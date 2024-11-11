@@ -13,7 +13,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(routes.dashboard())
+      navigate(routes.dashboardPageTasks())
     }
   }, [isAuthenticated])
 

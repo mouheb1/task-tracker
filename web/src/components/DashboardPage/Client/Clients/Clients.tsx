@@ -32,17 +32,12 @@ interface Client {
   id?: string
   givenName?: string
   familyName?: string
-  clientname?: string
   email?: string
   phone?: string
-  birthDate: Date
   gender: ClientGender
   avatar?: string;
-  role?: ClientRole
-  childrenIds?: string
-  grade?: Partial<Grade>
+  notes?: string;
   createdAt?: string
-  updatedAt?: string
 }
 
 interface PageInfo {
@@ -99,10 +94,10 @@ const Clients = ({ items, pageInfo, onPageChange, pageSize, currentPage, refetch
       },
     },
     {
-      title: 'Role',
+      title: 'Notes',
       key: 'role',
       render: (cellContext) => {
-        return cellContext.row.original.role || 'No Role'
+        return cellContext.row.original.notes || 'No Notes'
       },
     },
     {

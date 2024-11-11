@@ -13,6 +13,7 @@ export const QUERY: TypedDocumentNode<FindClients, FindClientsVariables> = gql`
     clients(limit: $limit, page: $page, sortBy: $sortBy, filter: $filter) {
       items {
         id
+        notes
         givenName
         familyName
         email

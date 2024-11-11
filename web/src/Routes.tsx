@@ -22,11 +22,10 @@ const Routes = () => {
       <PrivateSet unauthenticated="login">
 
         <Set wrap={DashboardLayout}>
-          {/* <Route path="/" page={HomePage} name="home" /> */}
-          <Route path="/dashboard" page={DashboardPage} name="dashboard" />
+          <Route path="/" page={DashboardPage} name="dashboard" />
 
           {/* Routes For ADMIN */}
-          <PrivateSet unauthenticated='home' roles={[ClientRole.ADMIN]}>
+          <PrivateSet unauthenticated='login' roles={[ClientRole.ADMIN]}>
 
             <Set wrap={ScaffoldLayout} title="Tasks" titleTo="dashboardPageTasks" buttonLabel="New Task" buttonTo="dashboardPageNewTask">
               <Route path="/dashboard/tasks/new" page={DashboardPageTaskNewTaskPage} name="dashboardPageNewTask" />

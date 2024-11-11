@@ -4,17 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Loader2 } from 'lucide-react';
 
-import type { EditClientById, UpdateClientInput, ClientRole } from 'types/graphql';
+import type { EditClientById, UpdateClientInput } from 'types/graphql';
 
 // Import subcomponents
 import PersonalDetails from './PersonalDetails';
 import ChangePassword from './ChangePassword';
 import { Button } from 'src/template/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from 'src/template/ui/tabs';
-import { OptionType, ClientGender } from 'src/lib/type';
+import { ClientGender } from 'src/lib/type';
 import { navigate, routes } from '@redwoodjs/router';
-
-import { useQuery } from '@redwoodjs/web';
 
 interface FormData {
   givenName: string;
@@ -24,6 +22,7 @@ interface FormData {
   birthDate: Date;
   gender: ClientGender;
   avatar: string;
+  notes: string;
   role: string | null;
 }
 
@@ -34,28 +33,14 @@ interface ClientFormProps {
   loading: boolean;
 }
 
-const tabs = [
-  {
-    label: 'Personal Details',
-    value: 'personal',
-  },
-  {
-    label: 'Relations',
-    value: 'relations',
-  },
-];
 
 
 const ClientForm: React.FC<ClientFormProps> = (props) => {
-  const [selectedRole, setSelectedRole] = useState<string | null>(props.client?.role || null);
 
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors },
-    setValue,
-    watch,
   } = useForm<FormData>({
     mode: 'onBlur',
     defaultValues: {
@@ -65,17 +50,9 @@ const ClientForm: React.FC<ClientFormProps> = (props) => {
       avatar: props.client?.avatar || '',
       gender: props.client?.gender as ClientGender || ClientGender.MALE,
       phone: props.client?.phone || '',
+      notes: props.client?.notes || '',
     },
   });
-
-  // Watch for role changes
-  const roleValue = watch('role');
-
-  useEffect(() => {
-    if (roleValue !== selectedRole) {
-      setSelectedRole(roleValue);
-    }
-  }, [roleValue, selectedRole, setValue]);
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     const formattedData: UpdateClientInput = {
@@ -85,6 +62,7 @@ const ClientForm: React.FC<ClientFormProps> = (props) => {
       phone: data.phone,
       avatar: data.avatar,
       gender: data.gender,
+      notes: data.notes,
     };
     props.onSave(formattedData, props?.client?.id);
   };
@@ -93,17 +71,7 @@ const ClientForm: React.FC<ClientFormProps> = (props) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {props.error && <div className="text-destructive mt-2">{props.error.message}</div>}
       <Tabs defaultValue="personal" className="p-0 px-1">
-        <TabsList className="bg-card flex-1 overflow-x-auto md:overflow-hidden w-full px-5 pt-6 pb-2.5 h-fit border-b border-default-200 rounded-none justify-start gap-12 rounded-t-md">
-          {tabs.map((tab, index) => (
-            <TabsTrigger
-              className="capitalize px-0 data-[state=active]:shadow-none data-[state=active]:bg-transparent data-[state=active]:text-primary transition duration-150 before:transition-all before:duration-150 relative before:absolute before:left-1/2 before:-bottom-[11px] before:h-[2px] before:-translate-x-1/2 before:w-0 data-[state=active]:before:bg-primary data-[state=active]:before:w-full"
-              value={tab.value}
-              key={`tab-${index}`}
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+
         <TabsContent value="personal" className="mt-6">
           {/* Personal Details */}
           <PersonalDetails control={control} errors={errors} loading={props.loading} />
