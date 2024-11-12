@@ -3,6 +3,7 @@ import type {
   MutationResolvers,
   TaskRelationResolvers,
 } from 'types/graphql'
+import { cloneDeep } from 'lodash';
 
 import { db } from 'src/lib/db'
 import { prismaBuildWhereClause } from '../../tools/prismaUtils'
@@ -57,18 +58,21 @@ export const task: QueryResolvers['task'] = async ({ id }, { context }) => {
       client: true,
       taskHistories: {
         orderBy: {
-          createdAt: 'asc'
-        }
-      }
+          createdAt: 'asc',
+        },
+      },
     },
-  })
+  });
 
   if (!task) {
-    throw new Error('Task not found')
+    throw new Error('Task not found');
   }
 
-  return task
-}
+  const taskData = cloneDeep(task);
+
+  return taskData;
+
+};
 
 export const createTask: MutationResolvers['createTask'] = async ({ input }, { context }) => {
   const { id: userId, orgId } = context.currentUser as unknown as CurrentUser

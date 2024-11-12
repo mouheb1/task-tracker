@@ -4272,6 +4272,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@open-draft/deferred-promise@npm:^2.1.0":
+  version: 2.2.0
+  resolution: "@open-draft/deferred-promise@npm:2.2.0"
+  checksum: 10c0/eafc1b1d0fc8edb5e1c753c5e0f3293410b40dde2f92688211a54806d4136887051f39b98c1950370be258483deac9dfd17cf8b96557553765198ef2547e4549
+  languageName: node
+  linkType: hard
+
 "@open-draft/until@npm:^1.0.3":
   version: 1.0.3
   resolution: "@open-draft/until@npm:1.0.3"
@@ -8102,6 +8109,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4":
+  version: 4.17.13
+  resolution: "@types/lodash@npm:4.17.13"
+  checksum: 10c0/c3d0b7efe7933ac0369b99f2f7bff9240d960680fdb74b41ed4bd1b3ca60cca1e31fe4046d9abbde778f941a41bc2a75eb629abf8659fa6c27b66efbbb0802a9
+  languageName: node
+  linkType: hard
+
 "@types/ms@npm:*":
   version: 0.7.34
   resolution: "@types/ms@npm:0.7.34"
@@ -8930,8 +8944,11 @@ __metadata:
     "@redwoodjs/api": "npm:8.4.0"
     "@redwoodjs/auth-dbauth-api": "npm:8.4.0"
     "@redwoodjs/graphql-server": "npm:8.4.0"
+    "@types/lodash": "npm:^4"
+    lodash: "npm:^4.17.21"
     moment-timezone: "npm:^0.5.46"
     pino-pretty: "npm:^11.2.2"
+    prisma-extension-soft-delete: "npm:^2.0.0"
   languageName: unknown
   linkType: soft
 
@@ -18177,6 +18194,29 @@ __metadata:
   version: 1.0.42
   resolution: "printable-characters@npm:1.0.42"
   checksum: 10c0/7c94d94c6041a37c385af770c7402ad5a2e8a3429ca4d2505a9f19fde39bac9a8fd1edfbfa02f1eae5b4b0f3536b6b8ee6c84621f7c0fcb41476b2df6ee20e4b
+  languageName: node
+  linkType: hard
+
+"prisma-extension-nested-operations@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "prisma-extension-nested-operations@npm:1.0.1"
+  dependencies:
+    "@open-draft/deferred-promise": "npm:^2.1.0"
+    lodash: "npm:^4.17.21"
+  peerDependencies:
+    "@prisma/client": "*"
+  checksum: 10c0/161f210c78d3e9ff10f2d84f4955936f2b0bcf7569a6eafade89825755d43deb927b96d30beda7d0c609f7396caf3291debfae160f32149badc6419b7450f509
+  languageName: node
+  linkType: hard
+
+"prisma-extension-soft-delete@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "prisma-extension-soft-delete@npm:2.0.0"
+  dependencies:
+    prisma-extension-nested-operations: "npm:^1.0.1"
+  peerDependencies:
+    "@prisma/client": "*"
+  checksum: 10c0/5e8db5f3ac9c3a3350435afb011f606ae13f93954c5b69a75c7971a8e0ab6b5cb843363d1b53c14db15bf4143881e316e0d2695c61f9d8e8e632d90b798a13ed
   languageName: node
   linkType: hard
 

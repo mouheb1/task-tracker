@@ -6,10 +6,15 @@
     "@redwoodjs/api": "8.4.0",
     "@redwoodjs/auth-dbauth-api": "8.4.0",
     "@redwoodjs/graphql-server": "8.4.0",
+    "lodash": "^4.17.21",
     "moment-timezone": "^0.5.46",
-    "pino-pretty": "^11.2.2"
+    "pino-pretty": "^11.2.2",
+    "prisma-extension-soft-delete": "^2.0.0"
   },
   "scripts": {
     "ap": "./../scripts/add_paths.sh ./src"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4"
   }
 }

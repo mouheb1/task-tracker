@@ -1,6 +1,8 @@
 // -- ./src/graphql/commun.sdl.ts
 export const schema = gql`
 
+scalar JSON
+
 enum SortDirection {
   ASC
   DESC
